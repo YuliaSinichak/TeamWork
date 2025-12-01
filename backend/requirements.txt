@@ -1,0 +1,10 @@
+django
+djangorestframework
+psycopg2-binary
+django-filter
+drf-yasg
+djangorestframework-simplejwt
+pillow
+python-dotenv
+dj-database-url
+django-cors-headers
