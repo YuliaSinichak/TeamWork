@@ -34,7 +34,7 @@
             <h1>Welcome to EduResourceHub</h1>
             <div id="user-info">
                 <span id="user-email"></span>
-                <button id="logout-btn">Logout</button>
+                <button id="logout-btn" style="display:none;">Logout</button>
             </div>
         </header>
 
@@ -42,7 +42,19 @@
             <h2>Resources</h2>
             <div id="resource-list"></div>
         </div>
+
+        <div id="resources" style="display:none;">
+            <h2>My Uploaded Resources</h2>
+            <div id="my-resource-list"></div>
+        </div>
+
+        <div id="admin-panel" style="display:none;">
+            <h2>Admin Panel: Pending Resources</h2>
+            <div id="pending-resource-list"></div>
+        </div>
     </div>
+    
+    <div id="notification-container"></div>
 
     <script src="app.js"></script>
 </body>

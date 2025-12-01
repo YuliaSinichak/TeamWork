@@ -18,10 +18,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_obj = User(
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
-            is_superuser=obj_in.is_superuser,
             role=obj_in.role,
-            first_name=obj_in.first_name,
+            is_superuser=True, # For testing admin panel
         )
+        if obj_in.first_name:
+            db_obj.first_name = obj_in.first_name
+        # if obj_in.is_superuser:
+        #     db_obj.is_superuser = obj_in.is_superuser
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)

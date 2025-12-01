@@ -21,10 +21,10 @@ app.add_middleware(
     allow_headers=["*"], # Allows all headers
 )
 
-@app.on_event("startup")
-async def startup_event():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def startup_event():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")

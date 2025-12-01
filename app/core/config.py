@@ -7,14 +7,17 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Security
-    SECRET_KEY: str = "changethis_to_a_secure_secret_key_in_production"
+    SECRET_KEY: str = "your-secret-key"  # Change this in production
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
-    # Database
-    # Defaulting to sqlite for ease of setup, but recommending postgres
-    # The database URL will be relative to the container's filesystem
-    DATABASE_URL: str = "sqlite+aiosqlite:///sql_app.db"
+    # Database settings
+    POSTGRES_SERVER: str = "db"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_DB: str = "app"
+    DATABASE_URL: str = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
+    SYNC_DATABASE_URL: str = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
 
     # CORS
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []

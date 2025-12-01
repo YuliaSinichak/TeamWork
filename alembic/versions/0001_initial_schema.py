@@ -19,6 +19,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # ### Manually drop all tables and types to ensure a clean slate ###
+    downgrade()
+
     # ### Create all tables ###
     op.create_table('users',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -103,19 +106,14 @@ def downgrade() -> None:
     # ### Drop all tables ###
     op.drop_table('user_likes')
     op.drop_table('resource_tags')
-    op.drop_index(op.f('ix_resources_title'), table_name='resources')
-    op.drop_index(op.f('ix_resources_id'), table_name='resources')
     op.drop_table('resources')
-    op.drop_index(op.f('ix_notes_title'), table_name='notes')
-    op.drop_index(op.f('ix_notes_id'), table_name='notes')
     op.drop_table('notes')
-    op.drop_index(op.f('ix_tags_name'), table_name='tags')
-    op.drop_index(op.f('ix_tags_id'), table_name='tags')
     op.drop_table('tags')
-    op.drop_index(op.f('ix_topics_name'), table_name='topics')
-    op.drop_index(op.f('ix_topics_id'), table_name='topics')
     op.drop_table('topics')
-    op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
+
+    # ### Drop all enum types ###
+    op.execute("DROP TYPE IF EXISTS userrole CASCADE")
+    op.execute("DROP TYPE IF EXISTS resourcetype CASCADE")
+    op.execute("DROP TYPE IF EXISTS resourcestatus CASCADE")
     # ### end Alembic commands ###

@@ -25,7 +25,6 @@ if config.config_file_name is not None:
 
 
 from db.base_class import Base
-from models import *  # Import all models to be discoverable by Alembic
 from core.config import settings
 
 target_metadata = Base.metadata
@@ -62,7 +61,7 @@ def run_migrations_online() -> None:
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = settings.DATABASE_URL
+    configuration['sqlalchemy.url'] = settings.SYNC_DATABASE_URL
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
