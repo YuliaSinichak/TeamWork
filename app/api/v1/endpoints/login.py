@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import schemas
 from app.api import deps
 from app.core import security
+from app.core.config import settings
 from app.services.user import user as user_service
-from app.core import settings
 
 router = APIRouter()
 

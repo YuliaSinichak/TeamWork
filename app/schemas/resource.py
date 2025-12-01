@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-from app.models.resource import ResourceType, ResourceStatus
+from app.schemas.enums import ResourceType, ResourceStatus
 from app.schemas.tag import Tag
 from app.schemas.topic import Topic
 from app.schemas.user import User
@@ -38,7 +38,7 @@ class ResourceInDBBase(ResourceBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Properties to return to client
 class Resource(ResourceInDBBase):

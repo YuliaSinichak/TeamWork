@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr
-from app.models.user import UserRole
+from app.schemas.enums import UserRole
 
 # Shared properties
 class UserBase(BaseModel):
@@ -27,7 +27,7 @@ class UserInDBBase(UserBase):
     email: EmailStr
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class User(UserInDBBase):

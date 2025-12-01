@@ -3,11 +3,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Enum
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 from app.models.resource import user_likes
-
-class UserRole(str, enum.Enum):
-    STUDENT = "student"
-    TEACHER = "teacher"
-    ADMIN = "admin"
+from app.schemas.enums import UserRole
 
 class User(Base):
     __tablename__ = "users"

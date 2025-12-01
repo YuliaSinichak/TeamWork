@@ -1,8 +1,9 @@
+import enum
 from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base_class import Base
-import enum
+from app.schemas.enums import ResourceType, ResourceStatus
 
 # Association Table for Many-to-Many relationship between Resource and Tag
 resource_tags = Table(
@@ -18,11 +19,6 @@ user_likes = Table(
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
     Column("resource_id", Integer, ForeignKey("resources.id"), primary_key=True),
 )
-
-class ResourceStatus(str, enum.Enum):
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
 
 class Resource(Base):
     __tablename__ = "resources"
