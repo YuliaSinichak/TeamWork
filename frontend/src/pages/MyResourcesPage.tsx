@@ -133,9 +133,16 @@ const MyResourcesPage: React.FC = () => {
               <div className="card-actions" style={{ marginTop: '1rem' }}>
                 {resource.file && (
                   <a
-                    href={`http://localhost:8000${resource.file}`}
+                    href={`http://localhost:8000/api/library/resources/${resource.id}/download/`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={async () => {
+                      try {
+                        await api.post(`/library/resources/${resource.id}/download/`);
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
                     className="btn btn-primary btn-sm">
                     Download
                   </a>

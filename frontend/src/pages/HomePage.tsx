@@ -214,7 +214,7 @@ const HomePage: React.FC = () => {
                   </Link>
                   {resource.file && (
                     <a
-                      href={`http://localhost:8000${resource.file}`}
+                      href={`http://localhost:8000/api/library/resources/${resource.id}/download/`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={async () => {

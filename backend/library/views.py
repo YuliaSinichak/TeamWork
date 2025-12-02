@@ -108,14 +108,20 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def approve(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.status = 'approved'
         resource.save()
         return Response({'status': 'resource approved'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def reject(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.status = 'rejected'
         resource.save()
         return Response({'status': 'resource rejected'}, status=status.HTTP_200_OK)
@@ -141,44 +147,84 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def hide(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.is_hidden = True
         resource.save()
         return Response({'status': 'resource hidden'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def unhide(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.is_hidden = False
         resource.save()
         return Response({'status': 'resource unhidden'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def mark_problematic(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.is_problematic = True
         resource.save()
         return Response({'status': 'resource marked as problematic'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def unmark_problematic(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.is_problematic = False
         resource.save()
         return Response({'status': 'resource unmarked as problematic'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def delete(self, request, pk=None):
-        resource = self.get_object()
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
         resource.delete()
         return Response({'status': 'resource deleted'}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticatedOrReadOnly])
     def download(self, request, pk=None):
-        resource = self.get_object()
-        resource.downloads_count += 1
-        resource.save()
-        return Response({'status': 'download counted'}, status=status.HTTP_200_OK)
+        from django.http import FileResponse, Http404, HttpResponse
+        from django.conf import settings
+        import os
+        
+        try:
+            resource = Resource.objects.get(pk=pk)
+        except Resource.DoesNotExist:
+            return Response({'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if request.method == 'POST':
+            resource.downloads_count += 1
+            resource.save()
+            return Response({'status': 'download counted'}, status=status.HTTP_200_OK)
+        
+        if not resource.file:
+            raise Http404("File not found")
+        
+        file_path = resource.file.path if hasattr(resource.file, 'path') else os.path.join(settings.MEDIA_ROOT, str(resource.file))
+        
+        if not os.path.exists(file_path):
+            file_path = os.path.join(settings.MEDIA_ROOT, str(resource.file).lstrip('/media/'))
+            if not os.path.exists(file_path):
+                raise Http404("File not found on server")
+        
+        response = FileResponse(open(file_path, 'rb'), as_attachment=True, filename=os.path.basename(file_path))
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
 
     @action(detail=True, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticatedOrReadOnly])
     def ratings(self, request, pk=None):
