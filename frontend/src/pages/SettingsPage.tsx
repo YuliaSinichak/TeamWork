@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 interface UserProfile {
   id: number;
@@ -31,7 +31,7 @@ const SettingsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const [profileResponse, resourcesResponse] = await Promise.all([
-          api.get('/users/profile/me/'),
+          api.get('/users/users/me/'),
           api.get('/library/resources/my/')
         ]);
         setProfile(profileResponse.data);

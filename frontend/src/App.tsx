@@ -7,11 +7,12 @@ import AddResourcePage from './pages/AddResourcePage';
 import SavedResourcesPage from './pages/SavedResourcesPage';
 import ProfilePage from './pages/ProfilePage';
 import ResourceDetailPage from './pages/ResourceDetailPage';
-import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
+import UserProfilePage from './pages/UserProfilePage';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import Footer from './components/Footer';
 import './App.css';
 import api from './api';
 
@@ -37,7 +38,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     const checkAdmin = async () => {
       if (auth?.isAuthenticated) {
         try {
-          const response = await api.get('/users/profile/me/');
+          const response = await api.get('/users/users/me/');
           setIsAdmin(response.data.is_staff || false);
         } catch (error) {
           console.error(error);
@@ -67,7 +68,7 @@ const AppContent: React.FC = () => {
     const checkAdmin = async () => {
       if (auth?.isAuthenticated) {
         try {
-          const response = await api.get('/users/profile/me/');
+          const response = await api.get('/users/users/me/');
           setIsAdmin(response.data.is_staff || false);
         } catch (error) {
           console.error(error);
@@ -99,8 +100,8 @@ const AppContent: React.FC = () => {
                 <Link to="/saved-resources" className="nav-link">
                   Saved
                 </Link>
-                <Link to="/settings" className="nav-link">
-                  Settings
+                <Link to="/profile" className="nav-link">
+                  Profile
                 </Link>
                 {isAdmin && (
                   <Link to="/admin" className="nav-link" style={{ color: 'var(--primary)' }}>
@@ -130,6 +131,7 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/resource/:id" element={<ResourceDetailPage />} />
+          <Route path="/user/:id" element={<UserProfilePage />} />
           <Route
             path="/my-resources"
             element={
@@ -163,10 +165,10 @@ const AppContent: React.FC = () => {
             }
           />
           <Route
-            path="/settings"
+            path="/profile"
             element={
               <PrivateRoute>
-                <SettingsPage />
+                <ProfilePage />
               </PrivateRoute>
             }
           />
@@ -180,6 +182,7 @@ const AppContent: React.FC = () => {
           />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 };

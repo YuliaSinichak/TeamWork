@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../context/AuthContext';
+import './HomePage.css';
 
 interface Resource {
   id: number;
@@ -10,6 +11,13 @@ interface Resource {
   tags?: Tag[];
   file?: string;
   owner?: string;
+  owner_id?: number;
+  average_rating?: number;
+  rating_count?: number;
+  user_rating?: number;
+  views_count?: number;
+  downloads_count?: number;
+  created_at?: string;
 }
 
 interface Tag {
@@ -21,7 +29,9 @@ const HomePage: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [authorSearch, setAuthorSearch] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('-created_at');
   const [loading, setLoading] = useState(true);
   const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const auth = useContext(AuthContext);
@@ -44,7 +54,9 @@ const HomePage: React.FC = () => {
       try {
         const params = new URLSearchParams();
         if (searchTerm) params.append('search', searchTerm);
+        if (authorSearch) params.append('author', authorSearch);
         if (selectedTag) params.append('tags__name', selectedTag);
+        if (sortBy) params.append('ordering', sortBy);
         
         const response = await api.get('/library/resources/', { params });
         setResources(response.data);
@@ -56,7 +68,7 @@ const HomePage: React.FC = () => {
     };
 
     fetchResources();
-  }, [searchTerm, selectedTag]);
+  }, [searchTerm, authorSearch, selectedTag, sortBy]);
 
   useEffect(() => {
     const fetchSavedResources = async () => {
@@ -102,24 +114,47 @@ const HomePage: React.FC = () => {
         Discover and explore educational resources shared by our community
       </p>
       
-      <div className="search-bar">
-        <input 
-          type="text" 
-          className="input search-input"
-          placeholder="Search resources..." 
-          value={searchTerm} 
-          onChange={e => setSearchTerm(e.target.value)} 
-        />
-        <select 
-          className="select filter-select"
-          value={selectedTag} 
-          onChange={e => setSelectedTag(e.target.value)}
-        >
-          <option value="">All Tags</option>
-          {tags.map(tag => (
-            <option key={tag.id} value={tag.name}>{tag.name}</option>
-          ))}
-        </select>
+      <div className="filters-container">
+        <div className="search-bar">
+          <input 
+            type="text" 
+            className="input search-input"
+            placeholder="Search by title or description..." 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+          />
+          <input 
+            type="text" 
+            className="input search-input"
+            placeholder="Search by author..." 
+            value={authorSearch} 
+            onChange={e => setAuthorSearch(e.target.value)} 
+          />
+        </div>
+        <div className="filters-row">
+          <select 
+            className="select filter-select"
+            value={selectedTag} 
+            onChange={e => setSelectedTag(e.target.value)}
+          >
+            <option value="">All Tags</option>
+            {tags.map(tag => (
+              <option key={tag.id} value={tag.name}>{tag.name}</option>
+            ))}
+          </select>
+          <select 
+            className="select filter-select"
+            value={sortBy} 
+            onChange={e => setSortBy(e.target.value)}
+          >
+            <option value="-created_at">Newest First</option>
+            <option value="created_at">Oldest First</option>
+            <option value="-views_count">Most Viewed</option>
+            <option value="-downloads_count">Most Downloaded</option>
+            <option value="rating">Highest Rated</option>
+            <option value="-rating">Lowest Rated</option>
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -132,41 +167,86 @@ const HomePage: React.FC = () => {
       ) : (
         <div className="grid grid-2">
           {resources.map((resource) => (
-            <div key={resource.id} className="card">
-              <Link to={`/resource/${resource.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <h2 className="card-title" style={{ cursor: 'pointer', color: 'var(--primary)' }}>
-                  {resource.title}
-                </h2>
-              </Link>
-              <p className="card-description">{resource.description}</p>
-              {resource.tags && resource.tags.length > 0 && (
-                <div className="tag-list">
-                  {resource.tags.map(tag => (
-                    <span key={tag.id} className="tag">{tag.name}</span>
-                  ))}
+            <div key={resource.id} className="resource-card">
+              <div className="resource-card-content">
+                <div className="resource-card-header">
+                  <Link to={`/resource/${resource.id}`} className="resource-card-title-link">
+                    <h2 className="resource-card-title">
+                      {resource.title}
+                    </h2>
+                  </Link>
+                  <p className="resource-card-description">{resource.description}</p>
                 </div>
-              )}
-              <div className="card-actions">
-                <Link to={`/resource/${resource.id}`} className="btn btn-primary btn-sm">
-                  View Details
-                </Link>
-                {auth?.isAuthenticated && (
-                  savedIds.has(resource.id) ? (
-                    <button 
-                      onClick={() => handleUnsave(resource.id)} 
-                      className="btn btn-secondary btn-sm"
-                    >
-                      Saved
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => handleSave(resource.id)} 
-                      className="btn btn-success btn-sm"
-                    >
-                      Save
-                    </button>
-                  )
+                
+                {resource.owner && resource.owner_id && (
+                  <div className="resource-card-author">
+                    <span>By:</span>
+                    <Link to={`/user/${resource.owner_id}`} className="resource-card-author-link">
+                      {resource.owner}
+                    </Link>
+                  </div>
                 )}
+                
+                {(resource.average_rating !== undefined && resource.average_rating > 0) && (
+                  <div className="resource-card-rating">
+                    <span className="rating-stars">
+                      {'★'.repeat(Math.round(resource.average_rating))}
+                      {'☆'.repeat(5 - Math.round(resource.average_rating))}
+                    </span>
+                    <span className="rating-value">{resource.average_rating.toFixed(1)}</span>
+                    {resource.rating_count !== undefined && resource.rating_count > 0 && (
+                      <span className="rating-count">({resource.rating_count})</span>
+                    )}
+                  </div>
+                )}
+                
+                {resource.tags && resource.tags.length > 0 && (
+                  <div className="resource-card-tags">
+                    {resource.tags.map(tag => (
+                      <span key={tag.id} className="resource-card-tag">{tag.name}</span>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="resource-card-footer">
+                  <Link to={`/resource/${resource.id}`} className="resource-card-button resource-card-button-primary">
+                    View Details
+                  </Link>
+                  {resource.file && (
+                    <a
+                      href={`http://localhost:8000${resource.file}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={async () => {
+                        try {
+                          await api.post(`/library/resources/${resource.id}/download/`);
+                        } catch (error) {
+                          console.error(error);
+                        }
+                      }}
+                      className="resource-card-button resource-card-button-secondary"
+                    >
+                      Download
+                    </a>
+                  )}
+                  {auth?.isAuthenticated && (
+                    savedIds.has(resource.id) ? (
+                      <button 
+                        onClick={() => handleUnsave(resource.id)} 
+                        className="resource-card-button resource-card-button-saved"
+                      >
+                        Saved
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleSave(resource.id)} 
+                        className="resource-card-button resource-card-button-success"
+                      >
+                        Save
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           ))}

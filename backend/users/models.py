@@ -11,6 +11,8 @@ class User(AbstractUser):
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='student')
     email = models.EmailField(unique=True)
     is_approved = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    block_reason = models.TextField(blank=True, null=True)
     saved_resources = models.ManyToManyField('library.Resource', related_name='saved_by', blank=True)
 
     USERNAME_FIELD = 'email'

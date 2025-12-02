@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api';
 
 interface Resource {
@@ -8,6 +9,7 @@ interface Resource {
   tags?: Array<{ id: number; name: string }>;
   file?: string;
   owner?: string;
+  owner_id?: number;
 }
 
 const SavedResourcesPage: React.FC = () => {
@@ -70,9 +72,14 @@ const SavedResourcesPage: React.FC = () => {
                 </div>
               )}
 
-              {resource.owner && (
+              {resource.owner && resource.owner_id && (
                 <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: '0.5rem' }}>
-                  By: {resource.owner}
+                  By:{' '}
+                  <Link
+                    to={`/user/${resource.owner_id}`}
+                    style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}>
+                    {resource.owner}
+                  </Link>
                 </p>
               )}
 
