@@ -7,7 +7,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'user_type')
+        fields = ('id', 'email', 'username', 'password', 'user_type', 'is_approved', 'is_staff')
+        read_only_fields = ('id', 'is_approved', 'is_staff')
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)

@@ -24,6 +24,14 @@ class ResourceViewSet(viewsets.ModelViewSet):
     filterset_fields = ['tags__name']
     search_fields = ['title', 'description']
 
+    def get_queryset(self):
+        if self.action == 'retrieve':
+            resource = Resource.objects.filter(pk=self.kwargs.get('pk')).first()
+            if resource and self.request.user.is_authenticated and resource.owner == self.request.user:
+                return Resource.objects.filter(pk=self.kwargs.get('pk'))
+            return Resource.objects.filter(status='approved', pk=self.kwargs.get('pk'))
+        return Resource.objects.filter(status='approved')
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
     
@@ -50,3 +58,23 @@ class ResourceViewSet(viewsets.ModelViewSet):
         saved_resources = user.saved_resources.all()
         serializer = self.get_serializer(saved_resources, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def pending(self, request):
+        pending_resources = Resource.objects.filter(status='pending')
+        serializer = self.get_serializer(pending_resources, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def approve(self, request, pk=None):
+        resource = self.get_object()
+        resource.status = 'approved'
+        resource.save()
+        return Response({'status': 'resource approved'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def reject(self, request, pk=None):
+        resource = self.get_object()
+        resource.status = 'rejected'
+        resource.save()
+        return Response({'status': 'resource rejected'}, status=status.HTTP_200_OK)
