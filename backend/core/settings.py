@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-la)77=55m@1ks=ggzvx*$34)1&m!aw@64i8s#voij0zjv61p=n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'teamwork-back.onrender.com']
 
 
 # Application definition
@@ -153,6 +153,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
+    "http://teamwork-3-k6s0.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
