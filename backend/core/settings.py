@@ -154,6 +154,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
     "http://teamwork-3-k6s0.onrender.com",
+    "https://teamwork-4.onrender.com"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
