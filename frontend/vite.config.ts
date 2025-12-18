@@ -7,7 +7,6 @@ export default defineConfig({
   server: {
     port: 5174,
     host: true,
-  
     allowedHosts: ['teamwork-3-k6s0.onrender.com'],
     hmr: {
       overlay: true,
