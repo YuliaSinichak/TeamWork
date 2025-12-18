@@ -17,10 +17,11 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-      - SECRET_KEY=your-secret-key
-      - DEBUG=1
+    # Load environment variables (DATABASE_URL, SECRET_KEY, DEBUG, etc.)
+    # from a `.env` file at the project root. Create `.env` by copying
+    # `.env.example` and filling in production credentials.
+    env_file:
+      - ./.env
   frontend:
     build: ./frontend
     ports:
