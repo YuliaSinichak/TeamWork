@@ -7,6 +7,8 @@ export default defineConfig({
   server: {
     port: 5174,
     host: true,
+    // allow the render host for requests proxied to this dev server
+    allowedHosts: ['teamwork-1-23dj.onrender.com'],
     hmr: {
       overlay: true,
     },
